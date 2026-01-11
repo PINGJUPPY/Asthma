@@ -265,3 +265,10 @@ function setTheme(themeName) {
         localStorage.setItem('app_theme', themeName);
     }
 }
+function hideAll() {
+    document.getElementById('view-register').classList.add('hidden');
+    document.getElementById('view-login').classList.add('hidden');
+    document.getElementById('view-admin-login').classList.add('hidden'); // เพิ่ม
+    document.getElementById('view-dashboard').classList.add('hidden');
+    document.getElementById('view-admin-dashboard').classList.add('hidden'); // เพิ่ม
+}
