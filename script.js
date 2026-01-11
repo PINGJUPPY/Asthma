@@ -241,3 +241,27 @@ function logout() {
     localStorage.removeItem('ashma_user');
     location.reload();
 }
+// ==========================================
+// ส่วนเสริม: Theme Switcher (เปลี่ยนสี)
+// ==========================================
+
+// โหลดธีมที่เคยเลือกไว้ (ถ้ามี) ตอนเปิดเว็บ
+const savedTheme = localStorage.getItem('app_theme');
+if (savedTheme) {
+    document.body.className = savedTheme;
+}
+
+// ฟังก์ชันเปลี่ยนธีม
+function setTheme(themeName) {
+    // ลบ Class ธีมเดิมออกให้หมดก่อน
+    document.body.classList.remove('theme-ocean', 'theme-urban');
+
+    if (themeName === 'theme-luxury') {
+        // ถ้าเป็น Luxury ไม่ต้องเติม class อะไร (ใช้ค่า Default ใน :root)
+        localStorage.setItem('app_theme', '');
+    } else {
+        // ถ้าเป็นธีมอื่น ให้เติม class นั้นเข้าไปที่ body
+        document.body.classList.add(themeName);
+        localStorage.setItem('app_theme', themeName);
+    }
+}
