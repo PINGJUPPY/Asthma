@@ -1,29 +1,346 @@
-body { font-family: 'Sarabun', sans-serif; background-color: #f4f7f6; margin: 0; padding: 20px; color: #333; }
-.container { max-width: 480px; margin: 0 auto; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+/* Import Fonts ที่ดูทันสมัย */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Poppins:wght@500;700&display=swap');
+
+/* ============================
+   1. CSS Variables & Themes
+   ============================ */
+:root {
+    /* Theme Default: Luxury Suite (กรมท่า/ทอง/ครีม) */
+    --primary-color: #1a2a6c;   /* สีหลัก (หัวข้อ, ปุ่มสำคัญ) */
+    --secondary-color: #b21f1f; /* สีรอง (ปุ่มกลับ, แจ้งเตือน) */
+    --accent-color: #fdbb2d;    /* สีเน้น (ไอคอน, ปุ่ม Action) */
+    --bg-body: #f0f2f5;         /* สีพื้นหลังรวม */
+    --bg-card: rgba(255, 255, 255, 0.9); /* สีพื้นหลังการ์ด (กระจกฝ้า) */
+    --text-dark: #2c3e50;
+    --text-light: #6c757d;
+    --shadow-soft: 0 10px 30px -10px rgba(0, 0, 0, 0.1);
+    --shadow-hover: 0 15px 35px -5px rgba(0, 0, 0, 0.2);
+    --radius-md: 16px;
+    --radius-lg: 24px;
+    --transition-speed: 0.3s ease;
+}
+
+/* Theme 2: Ocean Breeze (ฟ้าน้ำทะเล) - จะถูกเรียกใช้ผ่าน JS */
+body.theme-ocean {
+    --primary-color: #005c97;
+    --secondary-color: #363795;
+    --accent-color: #00d2ff;
+    --bg-body: #e0f7fa;
+}
+
+/* Theme 3: Urban Loft (เทา/ดำ/มินต์) */
+body.theme-urban {
+    --primary-color: #232526;
+    --secondary-color: #414345;
+    --accent-color: #00b09b;
+    --bg-body: #ece9e6;
+}
+
+/* ============================
+   2. Global Styles
+   ============================ */
+body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg-body);
+    /* เพิ่ม Background Gradient แบบเคลื่อนไหวได้ (Optional - ถ้าเครื่องช้าให้เอาออก) */
+    background: linear-gradient(-45deg, var(--bg-body), #ffffff, var(--bg-body));
+    background-size: 400% 400%;
+    animation: gradientBG 15s ease infinite;
+
+    margin: 0;
+    padding: 20px;
+    color: var(--text-dark);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: background var(--transition-speed);
+}
+
+@keyframes gradientBG {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+h2, h3, h4 {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin-top: 0;
+}
+
+.container {
+    width: 100%;
+    max-width: 500px;
+    /* Glassmorphism Effect */
+    background: var(--bg-card);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    
+    padding: 30px;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-soft);
+    transition: all var(--transition-speed);
+    
+    /* Animation ตอนโผล่มา */
+    animation: fadeUp 0.5s ease-out;
+}
+
+@keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
 .hidden { display: none; }
-h2, h3, h4 { margin-top: 0; }
-input, select, textarea { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
-.med-preview img, .med-card img { width: 100px; height: 100px; object-fit: contain; border-radius: 8px; border: 1px solid #eee; }
 
-/* Buttons */
-button { width: 100%; padding: 12px; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; margin-top: 10px; font-weight: bold; }
-.btn-primary { background-color: #3498db; color: white; }
-.btn-success { background-color: #2ecc71; color: white; padding: 15px; font-size: 18px; }
-.btn-secondary { background-color: #95a5a6; color: white; }
+/* ============================
+   3. Forms & Inputs
+   ============================ */
+input, select, textarea {
+    width: 100%;
+    padding: 15px;
+    margin: 10px 0 20px;
+    border: 2px solid transparent;
+    background: #f8f9fa;
+    border-radius: var(--radius-md);
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
+    transition: all var(--transition-speed);
+    box-sizing: border-box;
+}
 
-/* Dashboard Cards */
-.header-card { background: #e0f7fa; padding: 15px; border-radius: 10px; margin-bottom: 10px; text-align: center; }
-.med-card { display: flex; align-items: center; gap: 15px; background: #fff3e0; padding: 15px; border-radius: 10px; margin-bottom: 20px; }
-.med-name { color: #e65100; font-size: 1.2em; font-weight: bold; }
-.action-card { border: 2px dashed #2ecc71; padding: 15px; border-radius: 10px; text-align: center; background: #f0fff4; }
+input:focus, select:focus, textarea:focus {
+    outline: none;
+    background: #fff;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 4px rgba(var(--accent-color), 0.1); /* ต้องแปลงสีเป็น rgb ก่อนถึงจะใช้ rgba ได้ ถ้าขี้เกียจให้ใช้ box-shadow สีจางๆแทน */
+}
 
-/* History List */
+label {
+    font-weight: 600;
+    color: var(--primary-color);
+    font-size: 0.9em;
+    margin-bottom: 5px;
+    display: block;
+}
+
+.med-preview {
+    text-align: center;
+    margin: 20px 0;
+}
+.med-preview img {
+    width: 120px;
+    height: 120px;
+    object-fit: contain;
+    border-radius: 50%; /* รูปวงกลม */
+    border: 3px solid var(--accent-color);
+    padding: 5px;
+    background: white;
+    box-shadow: var(--shadow-soft);
+    transition: transform var(--transition-speed);
+}
+.med-preview img:hover {
+    transform: scale(1.05) rotate(5deg);
+}
+
+/* ============================
+   4. Buttons with Animation
+   ============================ */
+button {
+    width: 100%;
+    padding: 15px;
+    border: none;
+    border-radius: var(--radius-md);
+    font-size: 16px;
+    font-weight: 700;
+    font-family: 'Poppins', sans-serif;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+}
+
+button:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-hover);
+}
+
+button:active {
+    transform: translateY(-1px);
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+}
+
+.btn-success {
+    background: linear-gradient(135deg, #11998e, #38ef7d);
+    color: white;
+    font-size: 18px;
+    padding: 20px;
+}
+/* เพิ่ม Effect แสงวิ่งผ่านปุ่ม Success */
+.btn-success::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.3) 50%, rgba(255,255,255,0) 100%);
+    transform: rotate(45deg);
+    transition: all 0.5s;
+    opacity: 0;
+}
+.btn-success:hover::after {
+    left: 100%;
+    opacity: 1;
+    transition: 0.7s;
+}
+
+
+.btn-secondary {
+    background: #e9ecef;
+    color: var(--text-dark);
+}
+.btn-secondary:hover {
+    background: #dde2e6;
+}
+
+/* ============================
+   5. Dashboard Cards
+   ============================ */
+.header-card {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    padding: 25px;
+    border-radius: var(--radius-md);
+    margin-bottom: 20px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+.header-card h3, .header-card p { color: white; margin: 5px 0; }
+/* ลวดลายพื้นหลังจางๆ */
+.header-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.1' fill-rule='evenodd'%3E%3Ccircle cx='3' cy='3' r='3'/%3E%3Ccircle cx='13' cy='13' r='3'/%3E%3C/g%3E%3C/svg%3E");
+    opacity: 0.2;
+}
+
+
+.med-card {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    background: white;
+    padding: 20px;
+    border-radius: var(--radius-md);
+    margin-bottom: 25px;
+    border-left: 5px solid var(--accent-color);
+    box-shadow: var(--shadow-soft);
+}
+.med-card img {
+    width: 80px; height: 80px;
+    object-fit: contain;
+}
+.med-name {
+    color: var(--primary-color);
+    font-size: 1.3em;
+    margin: 5px 0;
+}
+
+.action-card {
+    background: rgba(46, 204, 113, 0.1); /* สีเขียวจางๆ */
+    border: 2px solid #2ecc71;
+    padding: 25px;
+    border-radius: var(--radius-md);
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+/* ============================
+   6. History List & Admin
+   ============================ */
+.history-section h4 {
+    border-bottom: 2px solid var(--accent-color);
+    padding-bottom: 10px;
+    display: inline-block;
+}
+
 #history-list { list-style: none; padding: 0; }
-#history-list li { background: #fff; border-bottom: 1px solid #eee; padding: 10px; display: flex; justify-content: space-between; }
-.symptom-alert { color: red; font-size: 0.9em; display: block; }
+#history-list li {
+    background: white;
+    margin-bottom: 10px;
+    padding: 15px;
+    border-radius: var(--radius-md);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: var(--shadow-soft);
+    transition: transform 0.2s;
+}
+#history-list li:hover {
+    transform: scale(1.02);
+}
+.symptom-alert {
+    color: var(--secondary-color);
+    font-weight: 600;
+    background: rgba(178, 31, 31, 0.1);
+    padding: 2px 8px;
+    border-radius: 4px;
+}
 
-/* Admin Grid */
-.admin-grid { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 15px; }
-.patient-card { background: white; border: 1px solid #ddd; padding: 10px; border-radius: 8px; }
-.admin-trigger { position: fixed; bottom: 10px; right: 10px; opacity: 0.3; cursor: pointer; }
+.admin-grid { display: grid; grid-template-columns: 1fr; gap: 15px; margin-top: 20px; }
+.patient-card {
+    background: white;
+    padding: 20px;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-soft);
+    border-top: 4px solid var(--primary-color);
+}
+.admin-trigger {
+    position: fixed; bottom: 20px; right: 20px;
+    background: var(--primary-color); color: white;
+    width: 40px; height: 40px; line-height: 40px;
+    text-align: center; border-radius: 50%;
+    cursor: pointer; opacity: 0.5; transition: 0.3s;
+    box-shadow: var(--shadow-soft);
+}
+.admin-trigger:hover { opacity: 1; transform: rotate(90deg); }
 .text-center { text-align: center; }
+a { color: var(--primary-color); text-decoration: none; font-weight: 600; }
+
+/* ============================
+   7. Theme Switcher (ปุ่มเปลี่ยนสี)
+   ============================ */
+.theme-switcher {
+    position: fixed;
+    top: 20px; right: 20px;
+    display: flex;
+    gap: 10px;
+    background: rgba(255,255,255,0.5);
+    padding: 10px;
+    border-radius: 30px;
+    backdrop-filter: blur(10px);
+    box-shadow: var(--shadow-soft);
+    z-index: 100;
+}
+.theme-btn {
+    width: 25px; height: 25px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid white;
+    transition: transform 0.2s;
+}
+.theme-btn:hover { transform: scale(1.2); }
+/* สีของปุ่มกด */
+.t-luxury { background: linear-gradient(135deg, #1a2a6c, #fdbb2d); }
+.t-ocean { background: linear-gradient(135deg, #005c97, #00d2ff); }
+.t-urban { background: linear-gradient(135deg, #232526, #00b09b); }
