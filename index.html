@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>บันทึกพ่นยาเด็ก</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
+</head>
+<body>
+
+    <div id="view-register" class="container">
+        <h2>📝 ลงทะเบียนผู้ป่วยใหม่</h2>
+        <form id="form-register">
+            <input type="text" id="reg-parent" placeholder="ชื่อ-สกุล ผู้ปกครอง" required>
+            <input type="tel" id="reg-phone" placeholder="เบอร์โทรศัพท์" required>
+            <input type="text" id="reg-patient" placeholder="ชื่อ-สกุล คนไข้" required>
+            <input type="text" id="reg-hn" placeholder="HN คนไข้ (รหัสประจำตัว)" required>
+            
+            <label>ยาพ่นประจำตัว:</label>
+            <select id="reg-med" onchange="updateMedImage()" required>
+                <option value="Ventolin">Ventolin (เวนโทลิน)</option>
+                <option value="Pulmicort">Pulmicort (พัลมิคอร์ต)</option>
+                <option value="Seretide">Seretide (เซเรไทด์)</option>
+            </select>
+            <div class="med-preview">
+                <img id="med-img-preview" src="https://via.placeholder.com/150?text=Select+Med" alt="Medication">
+            </div>
+
+            <textarea id="reg-note" placeholder="Note เพิ่มเติม (แพ้ยา/โรคประจำตัว)"></textarea>
+            
+            <button type="submit" class="btn-primary">ลงทะเบียน</button>
+        </form>
+        <p class="text-center" style="margin-top:20px;">
+            เคยลงทะเบียนแล้ว? <a href="#" onclick="showLogin()">เข้าสู่ระบบด้วย HN</a>
+        </p>
+    </div>
+
+    <div id="view-login" class="container hidden">
+        <h2>🔑 เข้าสู่ระบบ</h2>
+        <input type="text" id="login-hn" placeholder="กรอก HN คนไข้">
+        <button onclick="login()" class="btn-primary">เข้าใช้งาน</button>
+        <button onclick="showRegister()" class="btn-secondary">กลับไปลงทะเบียน</button>
+    </div>
+
+    <div id="view-dashboard" class="container hidden">
+        <div class="header-card">
+            <h3>น้อง <span id="display-name">...</span></h3>
+            <p>HN: <span id="display-hn">...</span></p>
+        </div>
+
+        <div class="med-card">
+            <img id="display-med-img" src="" alt="Medicine">
+            <div>
+                <h4>ยาที่ต้องใช้:</h4>
+                <p id="display-med-name" class="med-name">...</p>
+            </div>
+        </div>
+
+        <div class="action-card">
+            <h3>🕑 บันทึกการพ่นยา</h3>
+            <p>เวลาปัจจุบัน: <span id="current-time">--:--</span></p>
+            <input type="text" id="log-symptom" placeholder="อาการผิดปกติ (ถ้ามี ระบุ...)">
+            <button onclick="submitLog()" class="btn-success">✅ ยืนยันพ่นยาแล้ว</button>
+        </div>
+
+        <div class="history-section">
+            <h4>ประวัติการพ่นยาล่าสุด</h4>
+            <ul id="history-list">
+                <li>กำลังโหลด...</li>
+            </ul>
+        </div>
+        
+        <br>
+        <button onclick="logout()" class="btn-secondary">ออกจากระบบ</button>
+    </div>
+
+    <div id="view-admin" class="container hidden">
+        <h2>👨‍⚕️ Admin Dashboard</h2>
+        <button onclick="loadAdminData()" class="btn-primary">Refresh ข้อมูล</button>
+        <button onclick="location.reload()" class="btn-secondary">กลับหน้าหลัก</button>
+        <div id="admin-list" class="admin-grid">
+            </div>
+    </div>
+
+    <div class="admin-trigger" onclick="checkAdmin()">🔒</div>
+
+    <script src="script.js"></script>
+</body>
+</html>
