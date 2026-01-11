@@ -48,10 +48,6 @@ window.onload = function() {
         document.getElementById('btn-allow-notify').classList.add('hidden');
         document.getElementById('notify-msg').classList.remove('hidden');
     }
-    
-    if(localStorage.getItem('ashma_user')) {
-        // Optional: Auto redirect to Dashboard if needed
-    }
 
     updateTime();
     setInterval(updateTime, 1000);
@@ -67,10 +63,7 @@ function switchTab(pageId, navElement) {
     if(pageId === 'page-record') checkAuth();
 }
 
-function goToRecord() {
-    switchTab('page-record', document.querySelectorAll('.nav-item')[1]);
-}
-
+function goToRecord() { switchTab('page-record', document.querySelectorAll('.nav-item')[1]); }
 function updateTime() {
     const now = new Date();
     if(document.getElementById('current-time')) document.getElementById('current-time').innerText = now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' }) + " น.";
@@ -83,7 +76,7 @@ function setTheme(themeName) {
     localStorage.setItem('app_theme', document.body.className);
 }
 
-// --- Auth & Data ---
+// Auth
 function checkAuth() {
     const user = JSON.parse(localStorage.getItem('ashma_user'));
     if (user && user.hn) showDashboard(user); else showRegister();
@@ -105,11 +98,16 @@ function showDashboard(user) {
     loadHistory(user.hn);
 }
 
-// Register
+// Register (Fix: Added reg-note check)
 document.getElementById('form-register').addEventListener('submit', function(e) {
     e.preventDefault();
     const btn = this.querySelector('button');
     btn.innerText = "Processing..."; btn.disabled = true;
+    
+    // ดึงค่า note อย่างปลอดภัย
+    const noteElem = document.getElementById('reg-note');
+    const noteVal = noteElem ? noteElem.value : "";
+
     const data = {
         action: 'register',
         hn: document.getElementById('reg-hn').value,
@@ -119,7 +117,7 @@ document.getElementById('form-register').addEventListener('submit', function(e) 
         patient_name: document.getElementById('reg-patient').value,
         medication: document.getElementById('reg-med').value,
         med_image: MED_IMAGES[document.getElementById('reg-med').value] || "",
-        note: document.getElementById('reg-note').value
+        note: noteVal // ใช้ค่าที่เช็คแล้ว
     };
     fetch(WEB_APP_URL, { method: 'POST', mode: 'no-cors', headers: {'Content-Type': 'application/x-www-form-urlencoded'}, body: new URLSearchParams(data)})
     .then(() => {
@@ -138,7 +136,6 @@ function login() {
 }
 function logout() { localStorage.removeItem('ashma_user'); location.reload(); }
 
-// Submit Log with Gamification
 function submitLog() {
     const user = JSON.parse(localStorage.getItem('ashma_user'));
     const sym = document.getElementById('log-symptom').value;
