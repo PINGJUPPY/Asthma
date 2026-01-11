@@ -6,6 +6,9 @@
     <title>บันทึกพ่นยาเด็ก</title>
     <link rel="stylesheet" href="style.css">
     <link rel="manifest" href="manifest.json">
+    
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-messaging.js"></script>
 </head>
 <body>
 
@@ -29,7 +32,7 @@
 
             <textarea id="reg-note" placeholder="Note เพิ่มเติม (แพ้ยา/โรคประจำตัว)"></textarea>
             
-            <button type="submit" class="btn-primary">ลงทะเบียน</button>
+            <button type="submit" class="btn-primary">ลงทะเบียน & รับแจ้งเตือน</button>
         </form>
         <p class="text-center" style="margin-top:20px;">
             เคยลงทะเบียนแล้ว? <a href="#" onclick="showLogin()">เข้าสู่ระบบด้วย HN</a>
@@ -74,16 +77,6 @@
         <br>
         <button onclick="logout()" class="btn-secondary">ออกจากระบบ</button>
     </div>
-
-    <div id="view-admin" class="container hidden">
-        <h2>👨‍⚕️ Admin Dashboard</h2>
-        <button onclick="loadAdminData()" class="btn-primary">Refresh ข้อมูล</button>
-        <button onclick="location.reload()" class="btn-secondary">กลับหน้าหลัก</button>
-        <div id="admin-list" class="admin-grid">
-            </div>
-    </div>
-
-    <div class="admin-trigger" onclick="checkAdmin()">🔒</div>
 
     <script src="script.js"></script>
 </body>
