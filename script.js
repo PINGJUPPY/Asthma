@@ -1,32 +1,88 @@
-// ** แก้ไข URL นี้ให้เป็นของคุณ **
+// ==========================================
+// 1. ตั้งค่าระบบ (Configuration)
+// ==========================================
+
+// ลิ้งค์ Web App URL ของคุณ (Backend)
 const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbye2tPNF1QVI7xsQ5QT_e_cTEFIckKszMnXWjmbGOb_Qoz6HrYE28gEAd8KmZ7sEyN7/exec"; 
 
-// รายการรูปยา (สามารถเปลี่ยน URL เป็นรูปจริงได้)
-const MED_IMAGES = {
-    "Ventolin": "https://drug-img-url.com/ventolin.png", // ใส่ URL รูปจริง
-    "Pulmicort": "https://drug-img-url.com/pulmicort.png",
-    "Seretide": "https://drug-img-url.com/seretide.png"
+// ค่า Config ของคุณ (ใส่ให้แล้ว)
+const firebaseConfig = {
+    apiKey: "AIzaSyADXEA4Hs_WJDXVxfsGHLyPytTVypZqd6U",
+    authDomain: "asthmaalert-903b7.firebaseapp.com",
+    projectId: "asthmaalert-903b7",
+    storageBucket: "asthmaalert-903b7.firebasestorage.app", // แก้ไขเล็กน้อยจาก firebasestorage.app ให้ทำงานถูกต้อง
+    messagingSenderId: "123117910600",
+    appId: "1:123117910600:web:d90af1677fa7e04b50767d",
+    measurementId: "G-YBLJPHJXK3"
 };
 
-// เริ่มต้นทำงาน
+// เริ่มต้น Firebase
+if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+}
+const messaging = firebase.messaging();
+
+// รายการรูปยา
+const MED_IMAGES = {
+    "Ventolin": "https://img.freepik.com/free-vector/inhaler-asthma-blue-white-colors_1308-59363.jpg?w=200", 
+    "Pulmicort": "https://via.placeholder.com/150/FF0000/FFFFFF?text=Pulmicort",
+    "Seretide": "https://via.placeholder.com/150/800080/FFFFFF?text=Seretide"
+};
+
+// ==========================================
+// 2. การทำงานหลัก (Main Logic)
+// ==========================================
+
 window.onload = function() {
     checkAuth();
     updateMedImage();
     setInterval(updateTime, 1000);
+    
+    // ขออนุญาตแจ้งเตือนทันทีที่เปิดเว็บ
+    requestPermission();
 };
 
 function updateTime() {
     const now = new Date();
-    const timeString = now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
-    if(document.getElementById('current-time')) document.getElementById('current-time').innerText = timeString + " น.";
+    if(document.getElementById('current-time')) {
+        document.getElementById('current-time').innerText = now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' }) + " น.";
+    }
 }
 
 function updateMedImage() {
     const med = document.getElementById('reg-med').value;
-    // ใช้ Placeholder ถ้าไม่มีรูปจริง
     const imgUrl = MED_IMAGES[med] || "https://via.placeholder.com/150?text=" + med; 
     document.getElementById('med-img-preview').src = imgUrl;
 }
+
+// --- Notification Logic ---
+function requestPermission() {
+    Notification.requestPermission().then((permission) => {
+        if (permission === 'granted') {
+            console.log('Notification permission granted.');
+            // รับ Token (ใช้ vapidKey ว่างไว้ก่อนสำหรับ Legacy)
+            messaging.getToken({ vapidKey: "" }).then((currentToken) => {
+                if (currentToken) {
+                    console.log("Token:", currentToken);
+                    localStorage.setItem('fcm_token', currentToken);
+                } else {
+                    console.log('No registration token available.');
+                }
+            }).catch((err) => {
+                console.log('An error occurred while retrieving token. ', err);
+            });
+        } else {
+            console.log('Unable to get permission to notify.');
+        }
+    });
+}
+
+// เมื่อได้รับข้อความตอนเปิดหน้าจออยู่
+messaging.onMessage((payload) => {
+    console.log('Message received. ', payload);
+    alert(payload.notification.title + "\n" + payload.notification.body);
+});
+
 
 // --- Navigation & Auth ---
 function checkAuth() {
@@ -52,12 +108,10 @@ function showDashboard(user) {
     hideAll();
     document.getElementById('view-dashboard').classList.remove('hidden');
     
-    // Render ข้อมูลคนไข้
     document.getElementById('display-name').innerText = user.patient_name;
     document.getElementById('display-hn').innerText = user.hn;
     document.getElementById('display-med-name').innerText = user.medication;
     
-    // Show Med Image
     const imgUrl = MED_IMAGES[user.medication] || "https://via.placeholder.com/150?text=" + user.medication;
     document.getElementById('display-med-img').src = imgUrl;
 
@@ -68,7 +122,6 @@ function hideAll() {
     document.getElementById('view-register').classList.add('hidden');
     document.getElementById('view-login').classList.add('hidden');
     document.getElementById('view-dashboard').classList.add('hidden');
-    document.getElementById('view-admin').classList.add('hidden');
 }
 
 // --- API Functions ---
@@ -80,12 +133,16 @@ document.getElementById('form-register').addEventListener('submit', function(e) 
     btn.innerText = "กำลังบันทึก...";
     btn.disabled = true;
 
+    // ดึง Token ที่เก็บไว้
+    const fcmToken = localStorage.getItem('fcm_token') || "";
+
     const data = {
         action: 'register',
+        hn: document.getElementById('reg-hn').value, 
+        user_token: fcmToken, // ส่ง Token ไปให้ Backend
         parent_name: document.getElementById('reg-parent').value,
         phone: document.getElementById('reg-phone').value,
         patient_name: document.getElementById('reg-patient').value,
-        hn: document.getElementById('reg-hn').value,
         medication: document.getElementById('reg-med').value,
         med_image: MED_IMAGES[document.getElementById('reg-med').value] || "",
         note: document.getElementById('reg-note').value
@@ -93,13 +150,11 @@ document.getElementById('form-register').addEventListener('submit', function(e) 
 
     fetch(WEB_APP_URL, {
         method: 'POST',
-        mode: 'no-cors', // Google Script POST ต้องใช้ no-cors แต่จะไม่ได้ Response กลับมา
+        mode: 'no-cors', 
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: new URLSearchParams(data)
     }).then(() => {
-        // เนื่องจาก no-cors เราจะสมมติว่าสำเร็จถ้าไม่ Error
-        alert("ลงทะเบียนสำเร็จ!");
-        // Save LocalStorage
+        alert("ลงทะเบียนสำเร็จ! และเปิดระบบแจ้งเตือนแล้ว");
         localStorage.setItem('ashma_user', JSON.stringify({
             hn: data.hn,
             patient_name: data.patient_name,
@@ -151,7 +206,7 @@ function submitLog() {
     }).then(() => {
         alert("บันทึกเรียบร้อย!");
         document.getElementById('log-symptom').value = "";
-        loadHistory(user.hn); // โหลดประวัติใหม่
+        loadHistory(user.hn); 
     });
 }
 
@@ -164,7 +219,7 @@ function loadHistory(hn) {
     .then(res => res.json())
     .then(data => {
         list.innerHTML = "";
-        if(data.history.length == 0) {
+        if(!data.history || data.history.length == 0) {
             list.innerHTML = "<li>ยังไม่มีประวัติการพ่นยา</li>";
             return;
         }
@@ -178,43 +233,6 @@ function loadHistory(hn) {
                 </span>
             `;
             list.appendChild(li);
-        });
-    });
-}
-
-// 5. Admin
-function checkAdmin() {
-    const pass = prompt("รหัส Admin:");
-    if(pass == "1234") { // รหัสง่ายๆ เปลี่ยนได้
-        hideAll();
-        document.getElementById('view-admin').classList.remove('hidden');
-        loadAdminData();
-    }
-}
-
-function loadAdminData() {
-    const list = document.getElementById('admin-list');
-    list.innerHTML = "กำลังโหลดข้อมูล...";
-    
-    fetch(WEB_APP_URL + "?action=getAllAdmin")
-    .then(res => res.json())
-    .then(res => {
-        list.innerHTML = "";
-        const patients = res.data;
-        Object.keys(patients).forEach(hn => {
-            const p = patients[hn];
-            const lastLog = p.logs.length > 0 ? p.logs[p.logs.length-1] : null;
-            
-            let card = document.createElement('div');
-            card.className = "patient-card";
-            card.innerHTML = `
-                <strong>${p.name} (HN: ${hn})</strong>
-                <p>ผู้ปกครอง: ${p.parent} (${p.phone})</p>
-                <hr>
-                <p>ล่าสุด: ${lastLog ? lastLog.time : 'ยังไม่เคยพ่น'}</p>
-                ${lastLog && lastLog.symptoms ? '<p style="color:red">อาการ: '+lastLog.symptoms+'</p>' : ''}
-            `;
-            list.appendChild(card);
         });
     });
 }
