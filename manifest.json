@@ -1,10 +1,10 @@
 {
-  "name": "บันทึกพ่นยาเด็ก",
-  "short_name": "AsthmaLog",
+  "name": "Asthma Kids Care",
+  "short_name": "AsthmaCare",
   "start_url": "index.html",
   "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#3498db",
+  "theme_color": "#1a2a6c",
   "icons": [
     {
       "src": "https://cdn-icons-png.flaticon.com/512/3063/3063822.png",
