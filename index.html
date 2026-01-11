@@ -98,18 +98,21 @@
         <div id="view-register" class="container hidden">
             <h2>📝 ลงทะเบียน</h2>
             <form id="form-register">
-                <input type="text" id="reg-parent" placeholder="ชื่อ-สกุล ผู้ปกครอง" required>
-                <input type="tel" id="reg-phone" placeholder="เบอร์โทรศัพท์" required>
-                <input type="text" id="reg-patient" placeholder="ชื่อ-สกุล คนไข้" required>
-                <input type="text" id="reg-hn" placeholder="HN คนไข้" required>
-                <select id="reg-med" onchange="updateMedImage()" required>
-                    <option value="Ventolin">Ventolin</option>
-                    <option value="Pulmicort">Pulmicort</option>
-                    <option value="Seretide">Seretide</option>
-                </select>
-                <div class="med-preview"><img id="med-img-preview" src=""></div>
-                <button type="submit" class="btn-primary">ลงทะเบียน</button>
-            </form>
+    <input type="text" id="reg-parent" placeholder="ชื่อ-สกุล ผู้ปกครอง" required>
+    <input type="tel" id="reg-phone" placeholder="เบอร์โทรศัพท์" required>
+    <input type="text" id="reg-patient" placeholder="ชื่อ-สกุล คนไข้" required>
+    <input type="text" id="reg-hn" placeholder="HN คนไข้" required>
+    <select id="reg-med" onchange="updateMedImage()" required>
+        <option value="Ventolin">Ventolin</option>
+        <option value="Pulmicort">Pulmicort</option>
+        <option value="Seretide">Seretide</option>
+    </select>
+    <div class="med-preview"><img id="med-img-preview" src=""></div>
+    
+    <textarea id="reg-note" placeholder="Note เพิ่มเติม (แพ้ยา/โรคประจำตัว)"></textarea>
+
+    <button type="submit" class="btn-primary">ลงทะเบียน</button>
+</form>
             <p class="text-center"><a href="#" onclick="showLogin()">มีบัญชีแล้ว? เข้าสู่ระบบ</a></p>
         </div>
 
