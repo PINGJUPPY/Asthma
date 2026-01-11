@@ -11,7 +11,6 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-messaging.js"></script>
 </head>
 <body>
-
     <div class="theme-switcher">
         <div class="theme-btn t-luxury" onclick="setTheme('theme-luxury')"></div>
         <div class="theme-btn t-ocean" onclick="setTheme('theme-ocean')"></div>
@@ -23,9 +22,7 @@
             <i class='bx bx-error-circle' style="font-size:3em; color:#e74c3c;"></i>
             <h3>โปรดเปิดใน Browser</h3>
             <p>แอพจะไม่ทำงานสมบูรณ์หากเปิดผ่าน LINE</p>
-            <div class="instruction-arrow">
-                👆 กดจุด 3 จุด ด้านบน <br> แล้วเลือก "Open in Browser"
-            </div>
+            <div class="instruction-arrow">👆 กดจุด 3 จุด ด้านบน <br> แล้วเลือก "Open in Browser"</div>
             <button onclick="closeLineWarning()" class="btn-secondary btn-sm" style="margin-top:10px;">ปิดคำเตือน</button>
         </div>
     </div>
@@ -36,59 +33,37 @@
             <p>ติดตามการพ่นยา ห่างไกลหอบหืด</p>
             <img src="https://cdn-icons-png.flaticon.com/512/3063/3063822.png" alt="Logo">
         </div>
-        
         <div class="container onboarding-card">
             <h3>🚀 เริ่มต้นใช้งาน (3 ขั้นตอน)</h3>
-            
             <div class="step-item">
                 <div class="step-num">1</div>
                 <div class="step-content">
                     <h4>ติดตั้งลงเครื่อง</h4>
                     <p class="desc">เพื่อการใช้งานที่สะดวกที่สุด</p>
-                    
                     <div id="android-install-area" class="hidden">
-                        <button id="btn-install" class="btn-primary" onclick="installPWA()">
-                            <i class='bx bxs-download'></i> ติดตั้งแอพ
-                        </button>
+                        <button id="btn-install" class="btn-primary" onclick="installPWA()"><i class='bx bxs-download'></i> ติดตั้งแอพ</button>
                     </div>
-
                     <div id="ios-install-area" class="ios-guide hidden">
-                        <div class="ios-step">
-                            <span>1. กดปุ่มแชร์</span> <i class='bx bx-share'></i>
-                        </div>
-                        <div class="ios-step">
-                            <span>2. เลือก "เพิ่มไปยังหน้าจอโฮม"</span>
-                            <div class="add-home-icon"><i class='bx bx-plus-square'></i> Add to Home Screen</div>
-                        </div>
+                        <div class="ios-step"><span>1. กดปุ่มแชร์</span> <i class='bx bx-share'></i></div>
+                        <div class="ios-step"><span>2. เลือก "เพิ่มไปยังหน้าจอโฮม"</span><div class="add-home-icon"><i class='bx bx-plus-square'></i> Add to Home Screen</div></div>
                     </div>
-                    
-                    <div id="installed-msg" class="success-msg hidden">
-                        <i class='bx bx-check-circle'></i> ติดตั้งเรียบร้อย
-                    </div>
+                    <div id="installed-msg" class="success-msg hidden"><i class='bx bx-check-circle'></i> ติดตั้งเรียบร้อย</div>
                 </div>
             </div>
-
             <div class="step-item">
                 <div class="step-num">2</div>
                 <div class="step-content">
                     <h4>เปิดการแจ้งเตือน</h4>
                     <p class="desc">แจ้งเตือนเมื่อถึงเวลาพ่นยา</p>
-                    <button id="btn-allow-notify" class="btn-secondary" onclick="requestPermission()">
-                        <i class='bx bx-bell'></i> กดอนุญาตแจ้งเตือน
-                    </button>
-                    <div id="notify-msg" class="success-msg hidden">
-                        <i class='bx bx-check-circle'></i> เปิดแจ้งเตือนแล้ว
-                    </div>
+                    <button id="btn-allow-notify" class="btn-secondary" onclick="requestPermission()"><i class='bx bx-bell'></i> กดอนุญาตแจ้งเตือน</button>
+                    <div id="notify-msg" class="success-msg hidden"><i class='bx bx-check-circle'></i> เปิดแจ้งเตือนแล้ว</div>
                 </div>
             </div>
-
             <div class="step-item">
                 <div class="step-num">3</div>
                 <div class="step-content">
                     <h4>ลงทะเบียนคนไข้</h4>
-                    <button class="btn-primary" onclick="goToRecord()">
-                        ไปหน้าลงทะเบียน <i class='bx bx-right-arrow-alt'></i>
-                    </button>
+                    <button class="btn-primary" onclick="goToRecord()">ไปหน้าลงทะเบียน <i class='bx bx-right-arrow-alt'></i></button>
                 </div>
             </div>
         </div>
@@ -98,21 +73,19 @@
         <div id="view-register" class="container hidden">
             <h2>📝 ลงทะเบียน</h2>
             <form id="form-register">
-    <input type="text" id="reg-parent" placeholder="ชื่อ-สกุล ผู้ปกครอง" required>
-    <input type="tel" id="reg-phone" placeholder="เบอร์โทรศัพท์" required>
-    <input type="text" id="reg-patient" placeholder="ชื่อ-สกุล คนไข้" required>
-    <input type="text" id="reg-hn" placeholder="HN คนไข้" required>
-    <select id="reg-med" onchange="updateMedImage()" required>
-        <option value="Ventolin">Ventolin</option>
-        <option value="Pulmicort">Pulmicort</option>
-        <option value="Seretide">Seretide</option>
-    </select>
-    <div class="med-preview"><img id="med-img-preview" src=""></div>
-    
-    <textarea id="reg-note" placeholder="Note เพิ่มเติม (แพ้ยา/โรคประจำตัว)"></textarea>
-
-    <button type="submit" class="btn-primary">ลงทะเบียน</button>
-</form>
+                <input type="text" id="reg-parent" placeholder="ชื่อ-สกุล ผู้ปกครอง" required>
+                <input type="tel" id="reg-phone" placeholder="เบอร์โทรศัพท์" required>
+                <input type="text" id="reg-patient" placeholder="ชื่อ-สกุล คนไข้" required>
+                <input type="text" id="reg-hn" placeholder="HN คนไข้" required>
+                <select id="reg-med" onchange="updateMedImage()" required>
+                    <option value="Ventolin">Ventolin</option>
+                    <option value="Pulmicort">Pulmicort</option>
+                    <option value="Seretide">Seretide</option>
+                </select>
+                <div class="med-preview"><img id="med-img-preview" src=""></div>
+                <textarea id="reg-note" placeholder="Note เพิ่มเติม (แพ้ยา/โรคประจำตัว)"></textarea>
+                <button type="submit" class="btn-primary">ลงทะเบียน</button>
+            </form>
             <p class="text-center"><a href="#" onclick="showLogin()">มีบัญชีแล้ว? เข้าสู่ระบบ</a></p>
         </div>
 
@@ -152,12 +125,8 @@
             <input type="password" id="admin-pass" placeholder="Password (รหัสผ่าน)">
             <button onclick="checkAdmin()" class="btn-primary">Login</button>
         </div>
-
         <div id="view-admin-dashboard" class="container hidden" style="max-width:100%; margin-bottom:80px;">
-            <div class="admin-header">
-                <h2>รายชื่อผู้ป่วย</h2>
-                <button onclick="loadAdminData()" class="btn-sm">↻ Refresh</button>
-            </div>
+            <div class="admin-header"><h2>รายชื่อผู้ป่วย</h2><button onclick="loadAdminData()" class="btn-sm">↻ Refresh</button></div>
             <div class="filter-bar">
                 <span class="badge red">🔴 ขาดส่ง > 24ชม.</span>
                 <span class="badge yellow">🟡 มีอาการ</span>
@@ -166,7 +135,6 @@
             <div id="admin-list" class="admin-grid">Loading...</div>
             <button onclick="adminLogout()" class="btn-secondary" style="margin-top:20px;">Exit</button>
         </div>
-
         <div id="admin-modal" class="modal hidden">
             <div class="modal-content">
                 <span class="close-modal" onclick="closeModal()">&times;</span>
