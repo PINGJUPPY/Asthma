@@ -6,11 +6,16 @@
     <title>บันทึกพ่นยาเด็ก</title>
     <link rel="stylesheet" href="style.css">
     <link rel="manifest" href="manifest.json">
-    
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-messaging.js"></script>
 </head>
 <body>
+
+    <div class="theme-switcher">
+        <div class="theme-btn t-luxury" onclick="setTheme('theme-luxury')" title="Luxury Suite"></div>
+        <div class="theme-btn t-ocean" onclick="setTheme('theme-ocean')" title="Ocean Breeze"></div>
+        <div class="theme-btn t-urban" onclick="setTheme('theme-urban')" title="Urban Loft"></div>
+    </div>
 
     <div id="view-register" class="container">
         <h2>📝 ลงทะเบียนผู้ป่วยใหม่</h2>
@@ -29,21 +34,29 @@
             <div class="med-preview">
                 <img id="med-img-preview" src="https://via.placeholder.com/150?text=Select+Med" alt="Medication">
             </div>
-
             <textarea id="reg-note" placeholder="Note เพิ่มเติม (แพ้ยา/โรคประจำตัว)"></textarea>
-            
             <button type="submit" class="btn-primary">ลงทะเบียน & รับแจ้งเตือน</button>
         </form>
-        <p class="text-center" style="margin-top:20px;">
-            เคยลงทะเบียนแล้ว? <a href="#" onclick="showLogin()">เข้าสู่ระบบด้วย HN</a>
-        </p>
+        <div class="footer-link">
+            เคยลงทะเบียนแล้ว? <a href="#" onclick="showLogin()">เข้าสู่ระบบ</a> | 
+            <a href="#" onclick="showAdminLogin()" style="color: var(--secondary-color);">เจ้าหน้าที่</a>
+        </div>
     </div>
 
     <div id="view-login" class="container hidden">
-        <h2>🔑 เข้าสู่ระบบ</h2>
+        <h2>🔑 เข้าสู่ระบบ (คนไข้)</h2>
         <input type="text" id="login-hn" placeholder="กรอก HN คนไข้">
         <button onclick="login()" class="btn-primary">เข้าใช้งาน</button>
         <button onclick="showRegister()" class="btn-secondary">กลับไปลงทะเบียน</button>
+    </div>
+
+    <div id="view-admin-login" class="container hidden">
+        <h2 style="text-align:center;">🛡️ Admin Access</h2>
+        <p style="text-align:center; color: var(--text-light);">เฉพาะเจ้าหน้าที่เท่านั้น</p>
+        <input type="text" id="admin-user" placeholder="Username">
+        <input type="password" id="admin-pass" placeholder="Password">
+        <button onclick="submitAdminLogin()" class="btn-primary">เข้าสู่ระบบ</button>
+        <button onclick="showRegister()" class="btn-secondary">กลับหน้าหลัก</button>
     </div>
 
     <div id="view-dashboard" class="container hidden">
@@ -51,7 +64,6 @@
             <h3>น้อง <span id="display-name">...</span></h3>
             <p>HN: <span id="display-hn">...</span></p>
         </div>
-
         <div class="med-card">
             <img id="display-med-img" src="" alt="Medicine">
             <div>
@@ -59,23 +71,34 @@
                 <p id="display-med-name" class="med-name">...</p>
             </div>
         </div>
-
         <div class="action-card">
             <h3>🕑 บันทึกการพ่นยา</h3>
             <p>เวลาปัจจุบัน: <span id="current-time">--:--</span></p>
             <input type="text" id="log-symptom" placeholder="อาการผิดปกติ (ถ้ามี ระบุ...)">
             <button onclick="submitLog()" class="btn-success">✅ ยืนยันพ่นยาแล้ว</button>
         </div>
-
         <div class="history-section">
             <h4>ประวัติการพ่นยาล่าสุด</h4>
-            <ul id="history-list">
-                <li>กำลังโหลด...</li>
-            </ul>
+            <ul id="history-list"><li>กำลังโหลด...</li></ul>
+        </div>
+        <button onclick="logout()" class="btn-secondary" style="margin-top:20px;">ออกจากระบบ</button>
+    </div>
+
+    <div id="view-admin-dashboard" class="container hidden" style="max-width: 800px;"> <div style="display:flex; justify-content:space-between; align-items:center;">
+            <h2>👨‍⚕️ รายชื่อผู้ป่วยทั้งหมด</h2>
+            <button onclick="logout()" class="btn-secondary" style="width:auto; padding: 5px 15px; margin:0;">Exit</button>
         </div>
         
-        <br>
-        <button onclick="logout()" class="btn-secondary">ออกจากระบบ</button>
+        <div class="admin-stats">
+            <div class="stat-box">ผู้ป่วยทั้งหมด <b id="stat-total">0</b></div>
+            <div class="stat-box alert">ต้องติดตาม <b id="stat-alert">0</b></div>
+        </div>
+
+        <button onclick="loadAdminData()" class="btn-primary" style="margin-bottom:15px;">🔄 Refresh ข้อมูล</button>
+        
+        <div id="admin-list" class="admin-grid">
+            <p class="text-center">กำลังโหลดข้อมูล...</p>
+        </div>
     </div>
 
     <script src="script.js"></script>
