@@ -121,7 +121,9 @@ function showDashboard(user) {
 function hideAll() {
     document.getElementById('view-register').classList.add('hidden');
     document.getElementById('view-login').classList.add('hidden');
+    document.getElementById('view-admin-login').classList.add('hidden'); // เพิ่ม
     document.getElementById('view-dashboard').classList.add('hidden');
+    document.getElementById('view-admin-dashboard').classList.add('hidden'); // เพิ่ม
 }
 
 // --- API Functions ---
@@ -265,10 +267,99 @@ function setTheme(themeName) {
         localStorage.setItem('app_theme', themeName);
     }
 }
-function hideAll() {
-    document.getElementById('view-register').classList.add('hidden');
-    document.getElementById('view-login').classList.add('hidden');
-    document.getElementById('view-admin-login').classList.add('hidden'); // เพิ่ม
-    document.getElementById('view-dashboard').classList.add('hidden');
-    document.getElementById('view-admin-dashboard').classList.add('hidden'); // เพิ่ม
+// ==========================================
+// 🛡️ Admin System Logic
+// ==========================================
+
+function showAdminLogin() {
+    hideAll();
+    document.getElementById('view-admin-login').classList.remove('hidden');
+}
+
+function submitAdminLogin() {
+    const u = document.getElementById('admin-user').value;
+    const p = document.getElementById('admin-pass').value;
+
+    // ตรวจสอบรหัส (ตามที่คุณต้องการ)
+    if (u === 'admin' && p === '1234') {
+        loadAdminData();
+    } else {
+        alert("❌ ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง");
+    }
+}
+
+function loadAdminData() {
+    // โชว์หน้า Dashboard Admin
+    hideAll();
+    document.getElementById('view-admin-dashboard').classList.remove('hidden');
+    
+    const list = document.getElementById('admin-list');
+    list.innerHTML = '<p class="text-center">กำลังดึงข้อมูลจาก Server...</p>';
+
+    fetch(WEB_APP_URL + "?action=getAllAdmin")
+    .then(res => res.json())
+    .then(res => {
+        if(res.status !== "success") return alert("Error loading data");
+
+        const patients = res.data; // ได้ object รายชื่อคนไข้ทั้งหมด
+        renderAdminList(patients);
+    })
+    .catch(err => {
+        list.innerHTML = '<p class="text-center" style="color:red">โหลดข้อมูลไม่สำเร็จ</p>';
+    });
+}
+
+function renderAdminList(patients) {
+    const list = document.getElementById('admin-list');
+    list.innerHTML = ""; // เคลียร์ของเก่า
+
+    let total = 0;
+    let alertCount = 0;
+
+    // วนลูปคนไข้ทีละคน
+    Object.keys(patients).forEach(hn => {
+        total++;
+        const p = patients[hn];
+        const lastLog = p.logs.length > 0 ? p.logs[p.logs.length-1] : null;
+        
+        // วิเคราะห์สถานะ
+        let statusClass = "status-danger"; // สีแดง (ค่าเริ่มต้น: ไม่เคยพ่น)
+        let statusText = "ยังไม่มีข้อมูล";
+        
+        if (lastLog) {
+            // เช็คเวลาล่าสุด
+            // (ในที่นี้เราดูแค่ว่ามี Log ไหม ถ้าจะเอาละเอียดต้องเทียบ Date)
+            statusClass = "status-good"; // สีเขียว
+            statusText = "ล่าสุด: " + lastLog.time;
+            
+            // ถ้ามีอาการผิดปกติ -> สีเหลือง
+            if (lastLog.symptoms && lastLog.symptoms.trim() !== "") {
+                statusClass = "status-warning";
+                alertCount++;
+            }
+        } else {
+             alertCount++; // ไม่มีข้อมูลเลยก็นับเป็น alert
+        }
+
+        // สร้าง HTML Card
+        let card = document.createElement('div');
+        card.className = `admin-patient-card ${statusClass}`;
+        card.innerHTML = `
+            <div class="card-header">
+                <h4>${p.name}</h4>
+                <span class="card-hn">HN: ${hn}</span>
+            </div>
+            <div class="card-body">
+                <p><strong>ผู้ปกครอง:</strong> ${p.parent}</p>
+                <p class="last-update">🕑 ${statusText}</p>
+                ${lastLog && lastLog.symptoms ? `<span class="symptom-tag">⚠️ อาการ: ${lastLog.symptoms}</span><br>` : ''}
+                <a href="tel:${p.phone}" class="btn-call">📞 โทร ${p.phone}</a>
+            </div>
+        `;
+        list.appendChild(card);
+    });
+
+    // อัปเดตตัวเลขสถิติ
+    document.getElementById('stat-total').innerText = total;
+    document.getElementById('stat-alert').innerText = alertCount;
 }
