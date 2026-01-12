@@ -1,5 +1,12 @@
-// ** แก้ URL นี้ให้เป็นอันใหม่หลังจาก Deploy GAS ล่าสุด **
+// ==========================================
+// 1. Config & Setup
+// ==========================================
+
+// ** ตรวจสอบ URL นี้ให้ถูกต้อง (ต้องลงท้ายด้วย /exec) **
 const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbye2tPNF1QVI7xsQ5QT_e_cTEFIckKszMnXWjmbGOb_Qoz6HrYE28gEAd8KmZ7sEyN7/exec"; 
+
+// ✅ ใส่ VAPID Key ที่คุณส่งมาให้แล้วครับ
+const VAPID_KEY = "BEFQSgs9biYE5kcWoJNJmxfA90OBaQjFdTwyoijfA-TcmEzCmwXaYBl3g6XdiQ7zL4wC9IPs9_cLqH_gi43KNmQ";
 
 const firebaseConfig = {
     apiKey: "AIzaSyADXEA4Hs_WJDXVxfsGHLyPytTVypZqd6U",
@@ -20,17 +27,22 @@ const MED_IMAGES = {
     "Seretide": "https://via.placeholder.com/150/800080/FFFFFF?text=Seretide"
 };
 
+// ==========================================
+// 2. Initialization & Checks
+// ==========================================
+
 window.onload = function() {
+    // 1. Load Theme
     const savedTheme = localStorage.getItem('app_theme');
     if (savedTheme) document.body.className = savedTheme;
     
-    // Check LINE/FB Browser
+    // 2. Check Browser (LINE/FB)
     const ua = navigator.userAgent || navigator.vendor || window.opera;
     if ((ua.indexOf("FBAN") > -1) || (ua.indexOf("FBAV") > -1) || (ua.indexOf("Line") > -1)) {
         document.getElementById('line-warning').classList.remove('hidden');
     }
 
-    // Check Installation Status
+    // 3. Check Install Status
     if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
         document.getElementById('android-install-area').classList.add('hidden');
         document.getElementById('ios-install-area').classList.add('hidden');
@@ -43,10 +55,15 @@ window.onload = function() {
         }
     }
     
-    // Check Notification Status
+    // 4. Check Notification Permission
     if (Notification.permission === 'granted') {
         document.getElementById('btn-allow-notify').classList.add('hidden');
         document.getElementById('notify-msg').classList.remove('hidden');
+        
+        // เช็คว่ามี Token หรือยัง ถ้ายังให้ขอใหม่เงียบๆ
+        if (!localStorage.getItem('fcm_token')) {
+            requestPermission();
+        }
     }
 
     updateTime();
@@ -54,6 +71,10 @@ window.onload = function() {
 };
 
 function closeLineWarning() { document.getElementById('line-warning').classList.add('hidden'); }
+
+// ==========================================
+// 3. Navigation
+// ==========================================
 
 function switchTab(pageId, navElement) {
     document.querySelectorAll('.page-section').forEach(el => el.classList.remove('active'));
@@ -64,6 +85,7 @@ function switchTab(pageId, navElement) {
 }
 
 function goToRecord() { switchTab('page-record', document.querySelectorAll('.nav-item')[1]); }
+
 function updateTime() {
     const now = new Date();
     if(document.getElementById('current-time')) document.getElementById('current-time').innerText = now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' }) + " น.";
@@ -76,7 +98,10 @@ function setTheme(themeName) {
     localStorage.setItem('app_theme', document.body.className);
 }
 
-// Auth
+// ==========================================
+// 4. Auth & Views
+// ==========================================
+
 function checkAuth() {
     const user = JSON.parse(localStorage.getItem('ashma_user'));
     if (user && user.hn) showDashboard(user); else showRegister();
@@ -98,11 +123,28 @@ function showDashboard(user) {
     loadHistory(user.hn);
 }
 
-// Register (Fix: Added reg-note check)
+// ==========================================
+// 5. Register Logic (Updated with VAPID Key)
+// ==========================================
+
 document.getElementById('form-register').addEventListener('submit', function(e) {
     e.preventDefault();
     const btn = this.querySelector('button');
-    btn.innerText = "Processing..."; btn.disabled = true;
+    
+    // 🛡️ ป้องกันการกดรัวๆ
+    if (btn.disabled) return;
+
+    // 🛡️ ตรวจสอบ Token ก่อนส่ง
+    const token = localStorage.getItem('fcm_token');
+    if (!token) {
+        alert("⚠️ ระบบยังไม่ได้รับ 'รหัสแจ้งเตือน' จากมือถือเครื่องนี้\n\nกรุณารอสักครู่ หรือลองรีเฟรชหน้าเว็บ แล้วกดอนุญาตแจ้งเตือนอีกครั้ง");
+        // พยายามขอ Token ใหม่อีกรอบ
+        requestPermission();
+        return;
+    }
+
+    btn.innerText = "กำลังบันทึก..."; 
+    btn.disabled = true;
     
     // ดึงค่า note อย่างปลอดภัย
     const noteElem = document.getElementById('reg-note');
@@ -111,35 +153,49 @@ document.getElementById('form-register').addEventListener('submit', function(e) 
     const data = {
         action: 'register',
         hn: document.getElementById('reg-hn').value,
-        user_token: localStorage.getItem('fcm_token') || "",
+        user_token: token, // ✅ ส่ง Token ที่มีค่าแน่นอนแล้ว
         parent_name: document.getElementById('reg-parent').value,
         phone: document.getElementById('reg-phone').value,
         patient_name: document.getElementById('reg-patient').value,
         medication: document.getElementById('reg-med').value,
         med_image: MED_IMAGES[document.getElementById('reg-med').value] || "",
-        note: noteVal // ใช้ค่าที่เช็คแล้ว
+        note: noteVal
     };
-    fetch(WEB_APP_URL, { method: 'POST', mode: 'no-cors', headers: {'Content-Type': 'application/x-www-form-urlencoded'}, body: new URLSearchParams(data)})
+
+    fetch(WEB_APP_URL, { 
+        method: 'POST', 
+        mode: 'no-cors', 
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'}, 
+        body: new URLSearchParams(data)
+    })
     .then(() => {
-        alert("ลงทะเบียนสำเร็จ");
+        alert("ลงทะเบียนสำเร็จ! ระบบแจ้งเตือนพร้อมทำงานแล้ว ✅");
         localStorage.setItem('ashma_user', JSON.stringify({ hn: data.hn, patient_name: data.patient_name, medication: data.medication }));
         location.reload();
-    }).catch(e => { alert("Error"); btn.disabled = false; });
+    }).catch(e => { 
+        alert("เกิดข้อผิดพลาดในการเชื่อมต่อ: " + e); 
+        btn.disabled = false; 
+        btn.innerText = "ลงทะเบียน";
+    });
 });
 
 function login() {
     const hn = document.getElementById('login-hn').value;
     fetch(WEB_APP_URL + "?action=login&hn=" + hn).then(r=>r.json()).then(d => {
         if(d.status=="success") { localStorage.setItem('ashma_user', JSON.stringify(d.user)); location.reload(); }
-        else alert("ไม่พบข้อมูล");
+        else alert("ไม่พบข้อมูล HN นี้");
     });
 }
 function logout() { localStorage.removeItem('ashma_user'); location.reload(); }
 
+// ==========================================
+// 6. Logs & Rewards
+// ==========================================
+
 function submitLog() {
     const user = JSON.parse(localStorage.getItem('ashma_user'));
     const sym = document.getElementById('log-symptom').value;
-    if(!confirm("ยืนยัน?")) return;
+    if(!confirm("ยืนยันการบันทึก?")) return;
     
     fetch(WEB_APP_URL, { method: 'POST', headers: {'Content-Type': 'application/x-www-form-urlencoded'}, body: new URLSearchParams({action:'addLog', hn:user.hn, symptoms:sym})})
     .then(r=>r.json()).then(d => {
@@ -164,20 +220,23 @@ function checkReward(count) {
     const popup = document.getElementById('reward-popup');
     const t = document.getElementById('reward-title');
     const m = document.getElementById('reward-msg');
-    if(count % 10 === 0) { t.innerText="🏆 สุดยอด!"; m.innerText=`ครบ ${count} ครั้งแล้ว เยี่ยมมาก`; }
-    else if(count % 5 === 0) { t.innerText="⭐ เก่งมาก!"; m.innerText=`ครบ ${count} ครั้งแล้ว`; }
-    else { t.innerText="❤️ ขอบคุณ"; m.innerText="บันทึกเรียบร้อย"; setTimeout(closeReward, 1500); }
+    if(count % 10 === 0) { t.innerText="🏆 สุดยอดคุณแม่!"; m.innerText=`ดูแลน้องครบ ${count} ครั้งแล้ว ยอดเยี่ยมมากๆครับ`; }
+    else if(count % 5 === 0) { t.innerText="⭐ เก่งมากครับ!"; m.innerText=`พ่นยาครบ ${count} ครั้งแล้ว ทำต่อไปนะครับ`; }
+    else { t.innerText="❤️ ขอบคุณครับ"; m.innerText="บันทึกข้อมูลเรียบร้อยแล้ว"; setTimeout(closeReward, 1500); }
     popup.classList.remove('hidden');
 }
 function closeReward() { document.getElementById('reward-popup').classList.add('hidden'); }
 
-// Admin
+// ==========================================
+// 7. Admin
+// ==========================================
+
 function checkAdmin() {
     if(document.getElementById('admin-pass').value === '1234') {
         document.getElementById('view-admin-login').classList.add('hidden');
         document.getElementById('view-admin-dashboard').classList.remove('hidden');
         loadAdminData();
-    } else alert("รหัสผิด");
+    } else alert("รหัสผ่านไม่ถูกต้อง");
 }
 function adminLogout() { location.reload(); }
 function loadAdminData() {
@@ -209,16 +268,34 @@ function showModal(p, hn) {
 }
 function closeModal() { document.getElementById('admin-modal').classList.add('hidden'); }
 
-// Install & Notify
+// ==========================================
+// 8. Notifications & Install (Final Fix)
+// ==========================================
+
 function requestPermission() {
-    Notification.requestPermission().then(p => {
-        if(p==='granted') {
+    Notification.requestPermission().then(permission => {
+        if (permission === 'granted') {
             document.getElementById('btn-allow-notify').classList.add('hidden');
             document.getElementById('notify-msg').classList.remove('hidden');
-            messaging.getToken({vapidKey:""}).then(t => { if(t) localStorage.setItem('fcm_token', t); });
-        } else alert("กรุณาอนุญาตแจ้งเตือน");
+            
+            // ✅ ใช้ VAPID KEY ขอ Token
+            messaging.getToken({ vapidKey: VAPID_KEY }).then(currentToken => {
+                if (currentToken) {
+                    console.log("Token received:", currentToken);
+                    localStorage.setItem('fcm_token', currentToken);
+                } else {
+                    console.log('No registration token available.');
+                }
+            }).catch((err) => {
+                console.log('An error occurred while retrieving token. ', err);
+                // ไม่ Alert รบกวน User แต่ Log ไว้ดู
+            });
+        } else {
+            alert("กรุณากดอนุญาต (Allow) เพื่อให้ระบบแจ้งเตือนทำงานได้");
+        }
     });
 }
+
 let deferredPrompt;
 window.addEventListener('beforeinstallprompt', e => {
     e.preventDefault(); deferredPrompt = e;
