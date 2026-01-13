@@ -1,7 +1,6 @@
-importScripts('https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js');
-importScripts('https://www.gstatic.com/firebasejs/8.10.1/firebase-messaging.js');
+importScripts('https://www.gstatic.com/firebasejs/8.10.1/firebase-app-compat.js');
+importScripts('https://www.gstatic.com/firebasejs/8.10.1/firebase-messaging-compat.js');
 
-// ⚠️ Config ชุดเดียวกับใน script.js
 firebase.initializeApp({
     apiKey: "AIzaSyADXEA4Hs_WJDXVxfsGHLyPytTVypZqd6U",
     authDomain: "asthmaalert-903b7.firebaseapp.com",
@@ -14,14 +13,12 @@ firebase.initializeApp({
 
 const messaging = firebase.messaging();
 
-// จัดการการแสดงผลเมื่อได้รับแจ้งเตือนตอนปิดหน้าจอ (Background)
 messaging.onBackgroundMessage((payload) => {
   console.log('[firebase-messaging-sw.js] Received background message ', payload);
-  
   const notificationTitle = payload.notification.title;
   const notificationOptions = {
     body: payload.notification.body,
-    icon: 'https://cdn-icons-png.flaticon.com/512/3063/3063822.png' // ไอคอนแอพ
+    icon: 'https://cdn-icons-png.flaticon.com/512/3063/3063822.png'
   };
 
   self.registration.showNotification(notificationTitle, notificationOptions);
