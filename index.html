@@ -16,7 +16,6 @@
         <div class="theme-btn t-ocean" onclick="setTheme('theme-ocean')"></div>
         <div class="theme-btn t-urban" onclick="setTheme('theme-urban')"></div>
     </div>
-
     <div id="line-warning" class="line-overlay hidden">
         <div class="warning-box">
             <i class='bx bx-error-circle' style="font-size:3em; color:#e74c3c;"></i>
@@ -26,7 +25,6 @@
             <button onclick="closeLineWarning()" class="btn-secondary btn-sm" style="margin-top:10px;">ปิดคำเตือน</button>
         </div>
     </div>
-
     <div id="page-home" class="page-section active">
         <div class="hero-banner">
             <h1>Asthma Care</h1>
@@ -40,13 +38,8 @@
                 <div class="step-content">
                     <h4>ติดตั้งลงเครื่อง</h4>
                     <p class="desc">เพื่อการใช้งานที่สะดวกที่สุด</p>
-                    <div id="android-install-area" class="hidden">
-                        <button id="btn-install" class="btn-primary" onclick="installPWA()"><i class='bx bxs-download'></i> ติดตั้งแอพ</button>
-                    </div>
-                    <div id="ios-install-area" class="ios-guide hidden">
-                        <div class="ios-step"><span>1. กดปุ่มแชร์</span> <i class='bx bx-share'></i></div>
-                        <div class="ios-step"><span>2. เลือก "เพิ่มไปยังหน้าจอโฮม"</span><div class="add-home-icon"><i class='bx bx-plus-square'></i> Add to Home Screen</div></div>
-                    </div>
+                    <div id="android-install-area" class="hidden"><button id="btn-install" class="btn-primary" onclick="installPWA()"><i class='bx bxs-download'></i> ติดตั้งแอพ</button></div>
+                    <div id="ios-install-area" class="ios-guide hidden"><div class="ios-step"><span>1. กดปุ่มแชร์</span> <i class='bx bx-share'></i></div><div class="ios-step"><span>2. เลือก "เพิ่มไปยังหน้าจอโฮม"</span><div class="add-home-icon"><i class='bx bx-plus-square'></i> Add to Home Screen</div></div></div>
                     <div id="installed-msg" class="success-msg hidden"><i class='bx bx-check-circle'></i> ติดตั้งเรียบร้อย</div>
                 </div>
             </div>
@@ -68,7 +61,6 @@
             </div>
         </div>
     </div>
-
     <div id="page-record" class="page-section">
         <div id="view-register" class="container hidden">
             <h2>📝 ลงทะเบียน</h2>
@@ -88,77 +80,31 @@
             </form>
             <p class="text-center"><a href="#" onclick="showLogin()">มีบัญชีแล้ว? เข้าสู่ระบบ</a></p>
         </div>
-
         <div id="view-login" class="container hidden">
             <h2>🔑 เข้าสู่ระบบ</h2>
             <input type="text" id="login-hn" placeholder="กรอก HN คนไข้">
             <button onclick="login()" class="btn-primary">เข้าใช้งาน</button>
             <button onclick="showRegister()" class="btn-secondary">กลับไปลงทะเบียน</button>
         </div>
-
         <div id="view-dashboard" class="container hidden">
-            <div class="header-card">
-                <h3>น้อง <span id="display-name">...</span></h3>
-                <small>HN: <span id="display-hn">...</span></small>
-            </div>
-            <div class="med-card">
-                <img id="display-med-img" src="">
-                <div><h4>ยาที่ต้องใช้:</h4><p id="display-med-name" class="med-name">...</p></div>
-            </div>
-            <div class="action-card">
-                <h3>🕑 บันทึกการพ่นยา</h3>
-                <p>เวลาปัจจุบัน: <span id="current-time">--:--</span></p>
-                <input type="text" id="log-symptom" placeholder="อาการผิดปกติ (ถ้ามี)">
-                <button onclick="submitLog()" class="btn-success">✅ ยืนยันพ่นยาแล้ว</button>
-            </div>
-            <div class="history-section">
-                <h4>ประวัติล่าสุด</h4>
-                <ul id="history-list"><li>กำลังโหลด...</li></ul>
-            </div>
+            <div class="header-card"><h3>น้อง <span id="display-name">...</span></h3><small>HN: <span id="display-hn">...</span></small></div>
+            <div class="med-card"><img id="display-med-img" src=""><div><h4>ยาที่ต้องใช้:</h4><p id="display-med-name" class="med-name">...</p></div></div>
+            <div class="action-card"><h3>🕑 บันทึกการพ่นยา</h3><p>เวลาปัจจุบัน: <span id="current-time">--:--</span></p><input type="text" id="log-symptom" placeholder="อาการผิดปกติ (ถ้ามี)"><button onclick="submitLog()" class="btn-success">✅ ยืนยันพ่นยาแล้ว</button></div>
+            <div class="history-section"><h4>ประวัติล่าสุด</h4><ul id="history-list"><li>กำลังโหลด...</li></ul></div>
             <button onclick="logout()" class="btn-secondary" style="margin-top:20px;">ออกจากระบบ</button>
         </div>
     </div>
-
     <div id="page-admin" class="page-section">
-        <div id="view-admin-login" class="container">
-            <h2 class="text-center">🛡️ Admin Access</h2>
-            <input type="password" id="admin-pass" placeholder="Password (รหัสผ่าน)">
-            <button onclick="checkAdmin()" class="btn-primary">Login</button>
-        </div>
-        <div id="view-admin-dashboard" class="container hidden" style="max-width:100%; margin-bottom:80px;">
-            <div class="admin-header"><h2>รายชื่อผู้ป่วย</h2><button onclick="loadAdminData()" class="btn-sm">↻ Refresh</button></div>
-            <div class="filter-bar">
-                <span class="badge red">🔴 ขาดส่ง > 24ชม.</span>
-                <span class="badge yellow">🟡 มีอาการ</span>
-                <span class="badge green">🟢 ปกติ</span>
-            </div>
-            <div id="admin-list" class="admin-grid">Loading...</div>
-            <button onclick="adminLogout()" class="btn-secondary" style="margin-top:20px;">Exit</button>
-        </div>
-        <div id="admin-modal" class="modal hidden">
-            <div class="modal-content">
-                <span class="close-modal" onclick="closeModal()">&times;</span>
-                <h3 id="modal-title">...</h3>
-                <div id="modal-body">...</div>
-            </div>
-        </div>
+        <div id="view-admin-login" class="container"><h2 class="text-center">🛡️ Admin Access</h2><input type="password" id="admin-pass" placeholder="Password (รหัสผ่าน)"><button onclick="checkAdmin()" class="btn-primary">Login</button></div>
+        <div id="view-admin-dashboard" class="container hidden" style="max-width:100%; margin-bottom:80px;"><div class="admin-header"><h2>รายชื่อผู้ป่วย</h2><button onclick="loadAdminData()" class="btn-sm">↻ Refresh</button></div><div class="filter-bar"><span class="badge red">🔴 ขาดส่ง > 24ชม.</span><span class="badge yellow">🟡 มีอาการ</span><span class="badge green">🟢 ปกติ</span></div><div id="admin-list" class="admin-grid">Loading...</div><button onclick="adminLogout()" class="btn-secondary" style="margin-top:20px;">Exit</button></div>
+        <div id="admin-modal" class="modal hidden"><div class="modal-content"><span class="close-modal" onclick="closeModal()">&times;</span><h3 id="modal-title">...</h3><div id="modal-body">...</div></div></div>
     </div>
-
     <nav class="bottom-nav">
         <a href="#" class="nav-item active" onclick="switchTab('page-home', this)"><i class='bx bx-home'></i><span>หน้าแรก</span></a>
         <a href="#" class="nav-item" onclick="switchTab('page-record', this)"><i class='bx bx-plus-medical'></i><span>บันทึก</span></a>
         <a href="#" class="nav-item" onclick="switchTab('page-admin', this)"><i class='bx bx-user-pin'></i><span>Admin</span></a>
     </nav>
-
-    <div id="reward-popup" class="reward-overlay hidden">
-        <div class="reward-box">
-            <div class="confetti">🎉</div>
-            <h2 id="reward-title">ยอดเยี่ยม!</h2>
-            <p id="reward-msg">...</p>
-            <button onclick="closeReward()" class="btn-primary">ปิด</button>
-        </div>
-    </div>
-
+    <div id="reward-popup" class="reward-overlay hidden"><div class="reward-box"><div class="confetti">🎉</div><h2 id="reward-title">ยอดเยี่ยม!</h2><p id="reward-msg">...</p><button onclick="closeReward()" class="btn-primary">ปิด</button></div></div>
     <script src="script.js"></script>
 </body>
 </html>
